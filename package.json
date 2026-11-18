@@ -1,0 +1,63 @@
+{
+  "name": "simple-delete",
+  "productName": "Simple Delete",
+  "version": "0.3.0",
+  "description": "A local Windows application manager with reviewed cleanup and recovery.",
+  "author": "Simple Delete",
+  "private": true,
+  "type": "module",
+  "main": "desktop/main.mjs",
+  "scripts": {
+    "start": "node scripts/start-desktop.mjs",
+    "start:web": "node server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check:windows": "node scripts/validate-readonly.mjs",
+    "build": "node scripts/build-desktop.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "build": {
+    "appId": "com.simpledelete.desktop",
+    "productName": "Simple Delete",
+    "asar": true,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "desktop/**",
+      "public/**",
+      "lib/**",
+      "scripts/inventory.ps1",
+      "scripts/snapshot.ps1",
+      "server.mjs",
+      "package.json",
+      "assets/app.png",
+      "assets/icon.svg"
+    ],
+    "win": {
+      "target": "portable",
+      "signExecutable": false,
+      "icon": "assets/app.ico"
+    },
+    "portable": {
+      "artifactName": "Simple-Delete-${version}-Windows.exe"
+    },
+    "asarUnpack": [
+      "scripts/*.ps1"
+    ],
+    "compression": "normal"
+  },
+  "devDependencies": {
+    "electron": "^45.3.2",
+    "electron-builder": "^26.18.0"
+  },
+  "overrides": {
+    "app-builder-lib": {
+      "minimatch": "^11.0.1"
+    },
+    "@electron/universal": {
+      "minimatch": "^11.0.1"
+    }
+  }
+}

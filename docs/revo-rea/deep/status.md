@@ -1,0 +1,19 @@
+# Deep static investigation
+
+Target: `C:\Program Files\VS Revo Group\Revo Uninstaller\RevoUnin.exe`, SHA-256 `e4a69fee0105698736177ee9cc1772699cf92f7650ec1dcb0f78f2baae65b46e` (REA open result), PE x86-64. REA 6.9.0 used Ghidra 12.1.4, default analysis profile `b119a543d4f86946bc603a6525e3b8a3ef8e5f4ba621fca08cbc240d54fac7e3`. No target execution, real uninstall, registry or installed-software changes occurred.
+
+## Findings and limits
+
+The locally retained backup trace, evidence `ev_510c7c8acb65a38d826c3ed47c8ac1e63ceb04a4131071e3ebcc0f8fec976cbe`, identifies product text describing backup management for deleted registry entries, files and folders, including selecting individual items for restoration (`0x1414e1640`). This is a shipped interface claim, not proof that any particular data is saved or restored correctly. Other strings describe optional full registry backup and a system restore point, including skip, success and failure states. Their presence does not establish the operational sequence or failure policy.
+
+The trace connects strings at `0x1414dd4cc` and `0x1414dd4e4` to source addresses `0x14008ef8c` and `0x14008eda4` inside `FUN_14008ea40`. The locally retained function dossier, evidence `ev_0656f94424de1bdaa1097588983d14b7cafb319c46790d4b465e4f78d02777d8`, observes that this function loads UI resources, reads a named uninstaller restore-point setting through an unidentified helper, configures window controls and starts a thread at `FUN_14008e530`. The decompiler identifies a named setting read, but its storage mechanism and the helper's semantics are not established. The thread entry is a next investigation target, not a proven backup implementation call path.
+
+The same function references text describing Safe, Moderate and Advanced scan modes and instructing the user to scan for leftovers after the built-in uninstaller finishes. Those are interface descriptions; exact matching rules, root coverage, registry views, ordering and the behavior of each mode remain unknown. No deletion, backup creation, restoration or matching algorithm was traced. Ghidra reports possible missing names and types, unresolved indirect flows, and no independent cross-check of empty references; trace references cover matched start addresses only. Static results are not runtime observations.
+
+## Independent design opportunities
+
+The product text suggests a useful acceptance goal: make a completed cleanup's recoverable items individually visible and selectable, and clearly distinguish successful, failed and skipped protection steps. This is a proposed design, not a claim that the Rust application implements Revo's mechanism. Before adopting it, use fixtures that delete two independently backed-up items, restore one while preserving the other, report a missing or corrupt backup without claiming success, and prevent deletion when required backup creation fails. Keep explicit user review, same-volume quarantine and current backup-before-delete safeguards. No new broad scan or parity claim is justified by this evidence.
+
+## Lifecycle and recovery
+
+The first MCP search reached the client's 300-second deadline. A subsequent `close_binary` returned successful `{ "result": null }`, confirming release of that owned session. The CLI then ran a composed trace with `REA_GHIDRA_STARTUP_TIMEOUT_MS=900000`, completed in 441 seconds and exited successfully. A separate CLI function dossier also completed and exited successfully. Both complete JSON results are retained locally. The earlier incomplete attempt did not produce evidence and is superseded by these completed results. Windows Ghidra operates ephemerally, so each one-shot CLI command pays a cold import. A persistent REA client with a sufficiently long call deadline would allow follow-up queries on one Program; no additional analysis is pending.

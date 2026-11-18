@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.log
+desktop-smoke.json
+packaged-smoke.json
+portable-smoke.json
+native/target/
+native-diagnostics.json
+
+# Local investigation outputs and review notes
+/docs/revo-resources.json
+/docs/revo-rea/**/*.json
+/docs/revo-rea/**/*.stderr.txt
+/docs/sol-loop*review.md
